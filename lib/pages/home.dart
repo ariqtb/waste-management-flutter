@@ -11,6 +11,8 @@ import 'package:namer_app/geolocator.dart';
 import 'package:namer_app/providers/waste_data.dart';
 import '../components/show_pickup.dart';
 
+import '../components/show_data_pickup.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -51,7 +53,7 @@ class _DashboardState extends State<Dashboard> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = ShowPickup();
+        page = showDataPickup();
         break;
       case 1:
         page = GenerateLocator();
@@ -157,123 +159,5 @@ class _PickScheduleState extends State<PickSchedule> {
         ],
       ),
     );
-    // return Column(
-    //   children: [
-    //     Container(
-    //       // color: Colors.red,
-    //       padding: EdgeInsets.all(10),
-    //       child: Row(
-    //         children: [
-    //           Center(
-    //             child: ElevatedButton(
-    //               child: Text('data'),
-    //               onPressed: () {},
-    //             ),
-    //           )
-    //         ],
-    //       ),
-    //     ),
-    //   ],
-    // );
-
-    // return ListTile(
-    //   title: Text('data'),
-    //   subtitle: Text('data subtitle'),
-    // );
-
-    // return DataTable(
-    //   columns: [
-    //     DataColumn(
-    //         label: Expanded(
-    //             child: const Text(
-    //       'Nama',
-    //       style: TextStyle(fontStyle: FontStyle.italic),
-    //     ))),
-    //     DataColumn(
-    //         label: Expanded(
-    //             child: const Text(
-    //       'Age',
-    //       style: TextStyle(fontStyle: FontStyle.italic),
-    //     )))
-    //   ],
-    //   rows: [
-    //     DataRow(cells: [
-    //       DataCell(Text('Sarah')),
-    //       DataCell(Text('19')),
-    //     ]),
-    //     DataRow(cells: [
-    //       DataCell(Text('Janine')),
-    //       DataCell(Text('43')),
-    //     ]),
-    //   ],
-    // );
-
-    // return Center(
-    //   child: Container(
-    //     alignment: Alignment.center,
-    //     padding: EdgeInsets.all(15),
-    //     child: Column(
-    //       children: [
-    //         Table(
-    //           border: TableBorder.all(),
-    //           // columnWidths: const <int, TableColumnWidth>{
-    //           //   0: FixedColumnWidth(50),
-    //           //   1: FlexColumnWidth(),
-    //           //   2: FixedColumnWidth(64),
-    //           // },
-    //           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-    //           children: <TableRow>[
-    //             TableRow(
-    //               children: <Widget>[
-    //                 Container(
-    //                   alignment: Alignment.center,
-    //                   // padding: EdgeInsets.all(5),
-    //                   height: 40,
-    //                   color: Colors.green,
-    //                   child: const Text('data'),
-    //                 ),
-    //                 TableCell(
-    //                   verticalAlignment: TableCellVerticalAlignment.top,
-    //                   child: Container(
-    //                     color: Colors.red,
-    //                     child: const Text('data2'),
-    //                   ),
-    //                 ),
-    //                 Container(
-    //                   color: Colors.blue,
-    //                   child: const Text('data3'),
-    //                 ),
-    //               ],
-    //             ),
-    //             TableRow(
-    //               decoration: const BoxDecoration(
-    //                 color: Colors.grey,
-    //               ),
-    //               children: <Widget>[
-    //                 Container(
-    //                   height: 64,
-    //                   width: 128,
-    //                   color: Colors.purple,
-    //                   child: const Text('data'),
-    //                 ),
-    //                 Container(
-    //                   height: 32,
-    //                   color: Colors.yellow,
-    //                 ),
-    //                 Center(
-    //                   child: Container(
-    //                     height: 32,
-    //                     width: 32,
-    //                     color: Colors.orange,
-    //                   ),
-    //                 ),
-    //               ],
-    //             ),
-    //           ],
-    //         )
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }

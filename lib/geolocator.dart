@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -64,28 +67,32 @@ class _GenerateLocatorState extends State<GenerateLocator> {
     });
   }
 
-  Future<void> wastePOST() async {
+  Future<void> wastePOST(String currentDate, latitude, longitude) async {
     try {
+      final bodyParse = {
+        'pengepul': 'ww1234',
+        'location': {
+          'lat': latitude,
+          'long': longitude,
+        },
+        'date': currentDate,
+      };
       Response response = await post(
-          Uri.parse('https://waste-management.leeseona25.repl.co/waste'),
-          body: {
-            'pengepul': '123',
-            // 'jalur': '123',
-            // 'date': '123',
-            // 'recorded': true
-          });
-          if(response.statusCode == 200){
-            print('success');
-          } else{
-            print('failed banget');
-            print(response.body.toString());
-          }
+          Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/add'),
+          body: jsonEncode(bodyParse));
+      if (response.statusCode == 200) {
+        print('success');
+      } else {
+        print(response.statusCode);
+        print('failed banget');
+        print(bodyParse.toString());
+      }
     } catch (e) {
-      throw Exception('Failed dah');
+      throw Exception(e);
     }
   }
 
-    Future<void> _showDialogSuccess() async {
+  Future<void> _showDialogSuccess() async {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -107,6 +114,9 @@ class _GenerateLocatorState extends State<GenerateLocator> {
         });
   }
 
+  late String currentDate;
+  late String latitude;
+  late String longitude;
 
   @override
   Widget build(BuildContext context) {
@@ -123,14 +133,6 @@ class _GenerateLocatorState extends State<GenerateLocator> {
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            // Container(
-            //   padding: const EdgeInsets.fromLTRB(10, 30, 10, 10),
-            //   child: Text(
-            //     location,
-            //     textAlign: TextAlign.center,
-            //     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
             const SizedBox(
               height: 20,
             ),
@@ -176,7 +178,7 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                           color: Colors.green,
                         ),
                         onPressed: () async {
-                          // await wastePOST();
+                          await wastePOST(currentDate, latitude, longitude);
                           await _showDialogSuccess();
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -202,9 +204,14 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                               setState(() {
                                 loading = true;
                               });
+                              DateTime now = DateTime.now();
+                              currentDate = now.toString();
+
                               Position position =
                                   await _getGeoLocationPosition();
                               setState(() {
+                                latitude = position.latitude.toString();
+                                longitude = position.longitude.toString();
                                 loading = false;
                                 addTrashStatus = !addTrashStatus;
                                 print(addTrashStatus);

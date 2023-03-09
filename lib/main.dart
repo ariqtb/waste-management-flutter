@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'conn/mongodb.dart';
 import 'pages/login.dart';
+import 'conn/conn_api.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MongoDB.connect();
+   void isConnected = await connAPI();
   runApp(const MyApp());
 }
 
@@ -28,5 +29,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

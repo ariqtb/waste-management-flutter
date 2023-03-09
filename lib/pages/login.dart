@@ -38,7 +38,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   Future<void> loginFunc(String email, password) async {
     try {
       Response response = await post(
-          Uri.parse("https://waste-management.leeseona25.repl.co/login"),
+          Uri.parse("https://wastemanagement.tubagusariq.repl.co/login"),
           body: {
             'email': email,
             'password': password,
