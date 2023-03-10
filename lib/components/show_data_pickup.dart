@@ -25,7 +25,7 @@ class _showDataPickupState extends State<showDataPickup> {
         isLoading = true;
         data = json.decode(response.body);
       });
-      print(data);
+      print(data[0]['_id']);
     } else {
       throw Exception("Failed to load data");
     }

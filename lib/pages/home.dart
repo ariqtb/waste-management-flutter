@@ -10,6 +10,7 @@ import 'package:http/http.dart';
 import 'package:namer_app/geolocator.dart';
 import 'package:namer_app/providers/waste_data.dart';
 import '../components/show_pickup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/show_data_pickup.dart';
 
@@ -47,7 +48,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   var selectedIndex = 0;
-
+  
   @override
   Widget build(BuildContext context) {
     Widget page;
@@ -102,7 +103,7 @@ class _PickScheduleState extends State<PickSchedule> {
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     data.map((e) => _dataIRT.add(e));
-    return print(_dataIRT);
+    // return print(_dataIRT);
     // return data;
     // return data.map((e) => (print(e['_id']))).toList();
   } else {

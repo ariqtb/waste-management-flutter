@@ -4,9 +4,11 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:namer_app/pages/home.dart';
 import 'components/result_pickup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GenerateLocator extends StatefulWidget {
   const GenerateLocator({
@@ -66,26 +68,30 @@ class _GenerateLocatorState extends State<GenerateLocator> {
           '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
     });
   }
-
+  
   Future<void> wastePOST(String currentDate, latitude, longitude) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('email');
     try {
-      final bodyParse = {
-        'pengepul': 'ww1234',
+      Map<String, dynamic> theData = {
+        'pengepul': email,
         'location': {
           'lat': latitude,
           'long': longitude,
         },
         'date': currentDate,
       };
-      Response response = await post(
+      String bodyParse = jsonEncode(theData);
+      Response response = await http.post(
           Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/add'),
-          body: jsonEncode(bodyParse));
-      if (response.statusCode == 200) {
+          headers: {'Content-Type': 'application/json'},
+          body: bodyParse);
+      if (response.statusCode == 201) {
         print('success');
+        print(response.body);
       } else {
+        print(response.body);
         print(response.statusCode);
-        print('failed banget');
-        print(bodyParse.toString());
       }
     } catch (e) {
       throw Exception(e);
@@ -214,7 +220,7 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                                 longitude = position.longitude.toString();
                                 loading = false;
                                 addTrashStatus = !addTrashStatus;
-                                print(addTrashStatus);
+                                // print(addTrashStatus);
                                 location =
                                     '${position.latitude}, ${position.longitude}';
                                 getAddressFromLongLat(position);

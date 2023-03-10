@@ -36,14 +36,17 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   bool logged = false;
 
   Future<void> loginFunc(String email, password) async {
+    final prefs = await SharedPreferences.getInstance();
     try {
-      Response response = await post(
+      Response response = await http.post(
           Uri.parse("https://wastemanagement.tubagusariq.repl.co/login"),
           body: {
             'email': email,
             'password': password,
           });
       if (response.statusCode == 200) {
+        // final userEmail = json.encode(email);
+        await prefs.setString('email', email);
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (BuildContext context) {
@@ -93,6 +96,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Berhasil masuk'),
+            
             content: SingleChildScrollView(
               child: ListBody(
                 children: [],
