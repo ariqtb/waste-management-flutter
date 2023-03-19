@@ -4,12 +4,16 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:namer_app/pages/home.dart';
 import 'components/result_pickup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'components/geolocator.dart';
+import 'pages/detail_history_pickup.dart';
 
 class GenerateLocator extends StatefulWidget {
-  const GenerateLocator({
+  GenerateLocator({
     super.key,
   });
 
@@ -65,31 +69,6 @@ class _GenerateLocatorState extends State<GenerateLocator> {
       address =
           '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
     });
-  }
-
-  Future<void> wastePOST(String currentDate, latitude, longitude) async {
-    try {
-      final bodyParse = {
-        'pengepul': 'ww1234',
-        'location': {
-          'lat': latitude,
-          'long': longitude,
-        },
-        'date': currentDate,
-      };
-      Response response = await post(
-          Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/add'),
-          body: jsonEncode(bodyParse));
-      if (response.statusCode == 200) {
-        print('success');
-      } else {
-        print(response.statusCode);
-        print('failed banget');
-        print(bodyParse.toString());
-      }
-    } catch (e) {
-      throw Exception(e);
-    }
   }
 
   Future<void> _showDialogSuccess() async {
@@ -161,12 +140,13 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                           Icons.cancel_outlined,
                           color: Colors.redAccent,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
+                          await wastePOST(DateTime.now().toString());
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (BuildContext context) {
-                                return ResultPickup();
-                              },
+                              builder: (context) =>
+                                DetailHistoryPickup(),
+                              
                             ),
                           );
                         },
@@ -178,7 +158,6 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                           color: Colors.green,
                         ),
                         onPressed: () async {
-                          await wastePOST(currentDate, latitude, longitude);
                           await _showDialogSuccess();
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -214,10 +193,11 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                                 longitude = position.longitude.toString();
                                 loading = false;
                                 addTrashStatus = !addTrashStatus;
-                                print(addTrashStatus);
+                                // print(addTrashStatus);
                                 location =
                                     '${position.latitude}, ${position.longitude}';
                                 getAddressFromLongLat(position);
+                                addWaste(currentDate, latitude, longitude);
                                 info = 'Sampah berhasil diproses';
                               });
                             }

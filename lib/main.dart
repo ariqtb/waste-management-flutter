@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.green,
+        primaryColor: Colors.amber,
       ),
       home: Scaffold(
         body: MyStatefulWidget(),

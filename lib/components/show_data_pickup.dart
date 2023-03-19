@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../geolocator.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 
 class showDataPickup extends StatefulWidget {
   const showDataPickup({super.key});
@@ -13,7 +11,6 @@ class showDataPickup extends StatefulWidget {
 }
 
 class _showDataPickupState extends State<showDataPickup> {
-  // var db = FirebaseFirestore.instance;
   List<dynamic> data = [];
   bool isLoading = false;
 
@@ -24,8 +21,9 @@ class _showDataPickupState extends State<showDataPickup> {
       setState(() {
         isLoading = true;
         data = json.decode(response.body);
+        // print(data);
       });
-      print(data);
+      print(data[0]['_id']);
     } else {
       throw Exception("Failed to load data");
     }
@@ -40,38 +38,55 @@ class _showDataPickupState extends State<showDataPickup> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: 
-      !isLoading ? 
-      Center(child: CircularProgressIndicator(),) :
-      Column(
-        // mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (data.isNotEmpty)
-            Column(
-              children: data
-                  .map(
-                    (item) => ListTile(
-                      leading: CircleAvatar(
-                        child: Text('${data.indexOf(item) + 1}'),
-                      ),
-                      title: Text(item['produsen_id']),
-                      subtitle: Text(item['date']),
-                      trailing: Icon(Icons.arrow_forward),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) {
-                              return GenerateLocator();
-                            },
-                          ),
-                        );
-                      },
-                    ),
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text('Pengambilan Sampah'),
+          ),
+          body: Center(
+            child: !isLoading
+                ? Center(
+                    child: CircularProgressIndicator(),
                   )
-                  .toList(),
-            )
-        ],
+                : Column(
+                    // mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (data.isNotEmpty)
+                        Column(
+                          children: data
+                              .map(
+                                (item) => ListTile(
+                                  leading: CircleAvatar(
+                                    child: Text('${data.indexOf(item) + 1}'),
+                                  ),
+                                  title: Text("${item['date']}"),
+                                  // subtitle: Text(item['date']),
+                                  trailing: Icon(Icons.arrow_forward),
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                          return GenerateLocator();
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                              .toList(),
+                        )
+                    ],
+                  ),
+          ),
+        ),
       ),
     );
 

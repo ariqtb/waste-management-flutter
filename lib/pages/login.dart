@@ -36,22 +36,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   bool logged = false;
 
   Future<void> loginFunc(String email, password) async {
+    final prefs = await SharedPreferences.getInstance();
     try {
-      Response response = await post(
+      Response response = await http.post(
           Uri.parse("https://wastemanagement.tubagusariq.repl.co/login"),
           body: {
             'email': email,
             'password': password,
           });
       if (response.statusCode == 200) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return HomePage();
-            },
-          ),
-        );
-        _showDialogSuccess();
+        await prefs.setString('email', email);
+        setState(() {
+          loading = false;
+          logged = true;
+        });
       } else {
         _showDialogError(response.statusCode.toString());
         print(response.body);
@@ -65,24 +63,29 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Gagal masuk'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: [
-                  Text(
-                      'Silahkan cek kembali email dan password yang terdaftar'),
-                  Text('Error Code: ${statusCode}'),
-                ],
+          return WillPopScope(
+            onWillPop: () async {
+              return true;
+            },
+            child: AlertDialog(
+              title: const Text('Gagal masuk'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text(
+                        'Silahkan cek kembali email dan password yang terdaftar'),
+                    Text('Error Code: ${statusCode}'),
+                  ],
+                ),
               ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Okay'))
+              ],
             ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Okay'))
-            ],
           );
         });
   }
@@ -152,22 +155,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               ),
             ),
           ),
-          // DropdownRole(),
-          // GestureDetector(
-          //   onTap: () {
-          //     loginFunc(emailController.text.toString(),
-          //         passwordController.text.toString());
-          //   },
-          //   child: Container(
-          //     height: 50,
-          //     padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          //     decoration: BoxDecoration(
-          //       color: Colors.green,
-          //       borderRadius: BorderRadius.circular(10),
-          //     ),
-          //     child: Center(child: Text('Login')),
-          //   ),
-          // ),
           Container(
               padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
               height: 65,
@@ -179,10 +166,22 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                   });
                   await loginFunc(emailController.text.toString(),
                       passwordController.text.toString());
-                  setState(() {
-                    loading = false;
-                    logged = true;
-                  });
+                  if (logged == true) {
+                    // Navigator.push(context,
+                    //     MaterialPageRoute(builder: (context) => HomePage()));
+                    // Navigator.of(context).push(
+                    //   MaterialPageRoute(
+                    //     builder: (BuildContext context) {
+                    //       return MyStatefulWidget();
+                    //     },
+                    //   ),
+                    // );
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                        ModalRoute.withName("/Login"));
+                  }
+                  _showDialogSuccess();
                 },
               )),
           if (loading)

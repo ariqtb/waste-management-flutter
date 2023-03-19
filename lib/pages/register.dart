@@ -31,6 +31,10 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final password2Controller = TextEditingController();
+  final nameController = TextEditingController();
+  final addressController= TextEditingController();
+  final handphoneController = TextEditingController();
+  final roleController = TextEditingController();
 
   bool loading = false;
   bool logged = false;
@@ -49,6 +53,10 @@ class _RegisterWidgetState extends State<RegisterWidget> {
     final email = emailController.value.text;
     final password = passwordController.value.text;
     final password2 = password2Controller.value.text;
+    final name = nameController.value.text;
+    final address = addressController.value.text;
+    final handphone = handphoneController.value.text;
+    final role = roleController.value.text;
 
     if(email.isEmpty || password.isEmpty || password2.isEmpty) {
       return 'Can\'t be empty';
@@ -178,6 +186,17 @@ class _RegisterWidgetState extends State<RegisterWidget> {
               Container(
                 padding: const EdgeInsets.all(10),
                 child: TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nama',
+                    errorText: _errorText,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextFormField(
                   controller: emailController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
@@ -206,6 +225,33 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Konfirmasi Password',
+                    errorText: _errorText,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextFormField(
+                  obscureText: true,
+                  controller: handphoneController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nomor HP',
+                    errorText: _errorText,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextFormField(
+                  // obscureText: true,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 3,
+                  controller: addressController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Alamat',
                     errorText: _errorText,
                   ),
                 ),

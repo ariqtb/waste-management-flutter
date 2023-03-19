@@ -1,17 +1,21 @@
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:convert';
- 
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:namer_app/pages/login.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:namer_app/geolocator.dart';
 import 'package:namer_app/providers/waste_data.dart';
 import '../components/show_pickup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/show_data_pickup.dart';
+import '../pages/history_pickup.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -48,6 +52,92 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   var selectedIndex = 0;
 
+  Future<bool> onWillPop() async {
+    // return (
+    //   await showDialog<bool>(
+    //         context: context,
+    //         builder: (context) => AlertDialog(
+    //               title: Text('Konfirmasi'),
+    //               content: Text('Apakah anda ingin keluar?'),
+    //               actions: [
+    //                 ElevatedButton(
+    //                   onPressed: () => Navigator.of(context).pop(false),
+    //                   child: const Text('Tidak'),
+    //                 ),
+    //                 ElevatedButton(
+    //                   onPressed: () {
+    //                     Navigator.of(context).pop(true);
+    //                     Navigator.of(context).push(
+    //                       MaterialPageRoute(
+    //                         builder: (context) => MyStatefulWidget(),
+    //                       ),
+    //                     );
+    //                   },
+    //                   child: const Text('Ya'),
+    //                 ),
+    //               ],
+    //             ))
+    //             ) ??
+    //     false;
+    // return (await showDialog<bool>(
+    //         context: context,
+    //         builder: (context) => AlertDialog(
+    //               title: Text('Konfirmasi'),
+    //               content: Text('Apakah anda ingin keluar?'),
+    //               actions: [
+    //                 TextButton(
+    //                   onPressed: () => Navigator.of(context).pop(true),
+    //                   child: const Text('Tidak'),
+    //                 ),
+    //                 TextButton(
+    //                   onPressed: () {
+    //                     Navigator.of(context).pop(true);
+    //                   },
+    //                   child: const Text('Ya'),
+    //                 ),
+    //               ],
+    //             ))) ??
+    return false;
+  }
+
+  Future<bool> dialog() async {
+    AlertDialog(
+      actions: [
+        TextButton(
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+            child: Text('Tidak')),
+        TextButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            child: Text('Ya')),
+      ],
+    );
+    return false;
+  }
+
+  Future<bool?> confirmDialog(context) => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: const Text('Konfirmasi'),
+            content: const Text('Apakah anda ingin keluar?'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  child: Text('Tidak')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                    // Navigator.pop(context, true);
+                  },
+                  child: Text('Ya')),
+            ],
+          ));
+
   @override
   Widget build(BuildContext context) {
     Widget page;
@@ -56,107 +146,31 @@ class _DashboardState extends State<Dashboard> {
         page = showDataPickup();
         break;
       case 1:
-        page = GenerateLocator();
+        page = HistoryPickup();
         break;
       default:
         throw UnimplementedError('No widget selected');
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Pengambilan Sampah'),
-      ),
-      body: page,
-      bottomNavigationBar: NavigationBar(
-          destinations: [
-            NavigationDestination(
-                icon: Icon(Icons.home), label: "Daftar Pickup"),
-            NavigationDestination(icon: Icon(Icons.home), label: "Riwayat"),
-          ],
-          onDestinationSelected: (value) {
-            setState(() {
-              selectedIndex = value;
-            });
-          }),
-    );
-  }
-}
-
-class PickSchedule extends StatefulWidget {
-  const PickSchedule({super.key});
-
-  @override
-  State<PickSchedule> createState() => _PickScheduleState();
-}
-
-class _PickScheduleState extends State<PickSchedule> {
-  bool generateData = true;
-
-  Future<void> _fetchData() async {
-  bool generateData = true;
-  List _dataIRT = [];
-
-  final response = await http
-      .get(Uri.parse('https://waste-management.leeseona25.repl.co/waste/IRT'));
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    data.map((e) => _dataIRT.add(e));
-    return print(_dataIRT);
-    // return data;
-    // return data.map((e) => (print(e['_id']))).toList();
-  } else {
-    throw Exception('Failed Fetching');
-  }
-}
-
-  @override
-  Widget build(BuildContext context) {
-    // final wasteData = Provider.of
-    return Container(
-      padding: EdgeInsets.all(12),
-      child: Column(
-        children: [
-          Text(
-            'Pengambilan sampah terdekat',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-          ),
-          SizedBox(
-            height: 18,
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
-                  child: Container(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightGreen[100],
-                      ),
-                      child: ListTile(
-                        title: Text('_dataIRT'),
-                        subtitle: Text('data subtitle'),
-                      ),
-                      onPressed: () {},
-                    ),
-                  )),
+    return WillPopScope(
+      onWillPop: () async {
+        final pop = await confirmDialog(context);
+        return pop ?? false;
+      },
+      child: Scaffold(
+        body: page,
+        bottomNavigationBar: NavigationBar(
+            destinations: [
+              NavigationDestination(
+                  icon: Icon(Icons.home), label: "Daftar Pickup"),
+              NavigationDestination(
+                  icon: Icon(Icons.history), label: "Riwayat"),
             ],
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          // generateData ? 
-          ElevatedButton(
-            onPressed: () async {
-              _fetchData();
-              generateData = !generateData;
-            }, 
-          child: Text('Generate data')
-          ),
-          
-        ],
+            onDestinationSelected: (value) {
+              setState(() {
+                selectedIndex = value;
+              });
+            }),
       ),
     );
   }
