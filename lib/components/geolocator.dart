@@ -6,15 +6,14 @@ import 'package:http/http.dart' as http;
 class Location {
   String lat;
   String long;
-  String date;
 
-  Location({required this.lat, required this.long, required this.date});
+  Location({required this.lat, required this.long, });
 
   Map<String, dynamic> location() {
-    return {"lat": lat, "long": long, "date": date};
+    return {"lat": lat, "long": long};
   }
 }
-
+List<Map<String, dynamic>> waste = [];
 List<Map<String, dynamic>> location = [];
 
 Future<void> addWaste(String currentDate, latitude, longitude) async {
@@ -59,6 +58,7 @@ Future wastePOST(String currentDate) async {
     };
 
     String bodyParse = jsonEncode(waste);
+    await prefs.setString('waste', bodyParse);
     // return print(bodyParse);
     Response response = await http.post(
         Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/add'),

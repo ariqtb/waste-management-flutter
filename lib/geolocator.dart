@@ -7,10 +7,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:namer_app/pages/home.dart';
+import 'package:namer_app/pages/sorting_waste.dart';
 import 'components/result_pickup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'components/geolocator.dart';
 import 'pages/detail_history_pickup.dart';
+import 'pages/history_pickup.dart';
 
 class GenerateLocator extends StatefulWidget {
   GenerateLocator({
@@ -144,8 +146,8 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                           await wastePOST(DateTime.now().toString());
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                DetailHistoryPickup(),
+                              builder: (BuildContext context) =>
+                                OrganikRecord(),
                               
                             ),
                           );

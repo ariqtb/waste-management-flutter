@@ -116,105 +116,110 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.all(10),
-        child: ListView(children: <Widget>[
-          Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                'Waste App',
-                style: TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 30),
-              )),
-          Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                'Sign in',
-                style: TextStyle(fontSize: 20),
-              )),
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: TextFormField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Email',
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+              Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(10),
+                  child: const Text(
+                    'Waste App',
+                    style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 30),
+                  )),
+              Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(10),
+                  child: const Text(
+                    'Sign in',
+                    style: TextStyle(fontSize: 20),
+                  )),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Email',
+                  ),
+                ),
               ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-            child: TextFormField(
-              obscureText: true,
-              controller: passwordController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Password',
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: TextFormField(
+                  obscureText: true,
+                  controller: passwordController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Password',
+                  ),
+                ),
               ),
-            ),
-          ),
-          Container(
-              padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
-              height: 65,
-              child: ElevatedButton(
-                child: const Text('Login'),
-                onPressed: () async {
-                  setState(() {
-                    loading = true;
-                  });
-                  await loginFunc(emailController.text.toString(),
-                      passwordController.text.toString());
-                  if (logged == true) {
-                    // Navigator.push(context,
-                    //     MaterialPageRoute(builder: (context) => HomePage()));
+              Container(
+                  padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
+                  height: 65,
+                  child: ElevatedButton(
+                    child: const Text('Login'),
+                    onPressed: () async {
+                      setState(() {
+                        loading = true;
+                      });
+                      await loginFunc(emailController.text.toString(),
+                          passwordController.text.toString());
+                      if (logged == true) {
+                        // Navigator.push(context,
+                        //     MaterialPageRoute(builder: (context) => HomePage()));
+                        // Navigator.of(context).push(
+                        //   MaterialPageRoute(
+                        //     builder: (BuildContext context) {
+                        //       return MyStatefulWidget();
+                        //     },
+                        //   ),
+                        // );
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => HomePage()),
+                            ModalRoute.withName("/Login"));
+                      }
+                      _showDialogSuccess();
+                    },
+                  )),
+              if (loading)
+                Container(
+                  padding: EdgeInsets.all(25),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+              Container(
+                padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
+                alignment: Alignment.center,
+                child: Text('Belum punya akun?'),
+              ),
+              Container(
+                height: 55,
+                padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
+                child: OutlinedButton(
+                  child: Text('Daftar'),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterWidget()));
                     // Navigator.of(context).push(
                     //   MaterialPageRoute(
                     //     builder: (BuildContext context) {
-                    //       return MyStatefulWidget();
+                    //       return RegisterWidget();
                     //     },
                     //   ),
                     // );
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
-                        ModalRoute.withName("/Login"));
-                  }
-                  _showDialogSuccess();
-                },
-              )),
-          if (loading)
-            Container(
-              padding: EdgeInsets.all(25),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-          Container(
-            padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
-            alignment: Alignment.center,
-            child: Text('Belum punya akun?'),
+                  },
+                ),
+              ),
+            ]),
           ),
-          Container(
-            height: 55,
-            padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
-            child: OutlinedButton(
-              child: Text('Daftar'),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegisterWidget()));
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (BuildContext context) {
-                //       return RegisterWidget();
-                //     },
-                //   ),
-                // );
-              },
-            ),
-          ),
-        ]));
+        ));
   }
 }
 
