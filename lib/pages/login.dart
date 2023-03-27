@@ -52,6 +52,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         });
       } else {
         _showDialogError(response.statusCode.toString());
+        setState(() {
+          loading = false;
+        });
         print(response.body);
       }
     } catch (e) {
@@ -183,8 +186,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                             context,
                             MaterialPageRoute(builder: (context) => HomePage()),
                             ModalRoute.withName("/Login"));
-                      }
                       _showDialogSuccess();
+                      }
                     },
                   )),
               if (loading)

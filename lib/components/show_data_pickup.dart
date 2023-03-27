@@ -18,11 +18,12 @@ class _showDataPickupState extends State<showDataPickup> {
     final response = await http
         .get(Uri.parse('https://wastemanagement.tubagusariq.repl.co/produsen'));
     if (response.statusCode == 200) {
+      if(mounted){
       setState(() {
         isLoading = true;
         data = json.decode(response.body);
-        // print(data);
       });
+      }
       print(data[0]['_id']);
     } else {
       throw Exception("Failed to load data");
@@ -82,7 +83,18 @@ class _showDataPickupState extends State<showDataPickup> {
                                 ),
                               )
                               .toList(),
-                        )
+                        ),
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) {
+                                  return GenerateLocator();
+                                },
+                              ),
+                            );
+                          },
+                          child: Text('buka foto')),
                     ],
                   ),
           ),

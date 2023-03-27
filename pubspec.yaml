@@ -28,6 +28,8 @@ dependencies:
   intl: ^0.18.0
   camera: ^0.10.3+2
   path_provider: ^2.0.13
+  flutter_exif_rotation: ^0.5.1
+  image_picker: ^0.8.7
 
 dev_dependencies:
   flutter_test:

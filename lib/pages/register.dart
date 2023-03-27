@@ -32,9 +32,11 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   final passwordController = TextEditingController();
   final password2Controller = TextEditingController();
   final nameController = TextEditingController();
-  final addressController= TextEditingController();
+  final addressController = TextEditingController();
   final handphoneController = TextEditingController();
   final roleController = TextEditingController();
+  List<String> role = ['irt', 'pengepul', 'petugas'];
+  String? roleSelected;
 
   bool loading = false;
   bool logged = false;
@@ -58,34 +60,38 @@ class _RegisterWidgetState extends State<RegisterWidget> {
     final handphone = handphoneController.value.text;
     final role = roleController.value.text;
 
-    if(email.isEmpty || password.isEmpty || password2.isEmpty) {
+    if (email.isEmpty || password.isEmpty || password2.isEmpty) {
       return 'Can\'t be empty';
     }
     return null;
   }
 
-  Future<void> registFunc(String email, password, password2) async {
-    final bool isValidEmail = EmailValidator.validate(email);
-    if(!isValidEmail) {
+  Future<void> registFunc() async {
+    // return print(emailController.text.trim());
+    final bool isValidEmail =
+        EmailValidator.validate(emailController.text.trim());
+    if (!isValidEmail) {
       return print('Masukkan email yang benar');
     }
-    if (password != password2) {
-      return print('salah pass');
+    if (passwordController.text.trim() != password2Controller.text.trim()) {
+      return _showDialogError('Password tidak sama!');
     } else {
       try {
         Response response = await post(
-            Uri.parse("https://waste-management.leeseona25.repl.co/register"),
+            Uri.parse("https://wastemanagement.tubagusariq.repl.co/register"),
             body: {
-              'name': 'test',
-              'password': password,
-              'address': 'test',
-              'handphone': '081111',
-              'email': email,
-              'role': 'Pengepul',
-              
+              'name': nameController.text.trim(),
+              'address': addressController.text.trim(),
+              'email': emailController.text.trim(),
+              'password': passwordController.text.trim(),
+              'verPassword': password2Controller.text.trim(),
+              'handphone': handphoneController.text.trim(),
+              'role': 'pengepul',
             });
         if (response.statusCode == 200) {
-          return _showDialogSuccess();
+          print(response.body);
+          print(response.statusCode);
+          // return _showDialogSuccess();
         } else {
           return _showDialogError(response.body.toString());
         }
@@ -113,12 +119,12 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) {
-                      return MyApp();
-                    },
-                  ),
-                );
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return MyApp();
+                        },
+                      ),
+                    );
                   },
                   child: Text('Okay'))
             ],
@@ -126,7 +132,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         });
   }
 
-  Future<void> _showDialogError(String statusCode) async {
+  Future<void> _showDialogError(String status) async {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -135,9 +141,9 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             content: SingleChildScrollView(
               child: ListBody(
                 children: [
-                  Text(
-                      'Silahkan cek kembali email dan password yang terdaftar'),
-                  Text('Error Code: ${statusCode}'),
+                  // Text(
+                  //     'Silahkan cek kembali email dan password yang terdaftar'),
+                  Text(status),
                 ],
               ),
             ),
@@ -190,7 +196,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Nama',
-                    errorText: _errorText,
+                    // errorText: _errorText,
                   ),
                 ),
               ),
@@ -201,7 +207,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Email',
-                    errorText: _errorText,
+                    // errorText: _errorText,
                   ),
                 ),
               ),
@@ -213,7 +219,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Password',
-                    errorText: _errorText,
+                    // errorText: _errorText,
                   ),
                 ),
               ),
@@ -225,7 +231,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Konfirmasi Password',
-                    errorText: _errorText,
+                    // errorText: _errorText,
                   ),
                 ),
               ),
@@ -237,7 +243,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Nomor HP',
-                    errorText: _errorText,
+                    // errorText: _errorText,
                   ),
                 ),
               ),
@@ -252,10 +258,16 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Alamat',
-                    errorText: _errorText,
+                    // errorText: _errorText,
                   ),
                 ),
               ),
+              // Container(
+              //   child: DropdownButton(
+              //     value: roleSelected,
+              //     items: role.map((String value) => DropdownMenuItem(child: child))
+              //   ),
+              // ),
               Container(
                   padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
                   height: 65,
@@ -265,20 +277,18 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       setState(() {
                         loading = true;
                       });
-                      await registFunc(
-                          emailController.text.toString(),
-                          passwordController.text.toString(),
-                          password2Controller.text.toString());
+                      await registFunc();
                       setState(() {
                         loading = false;
                         logged = true;
                       });
                     },
                   )),
-                  if (loading) Container(
-                padding: EdgeInsets.all(25),
-                child: const Center(child: CircularProgressIndicator()),
-              ),
+              if (loading)
+                Container(
+                  padding: EdgeInsets.all(25),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
               Container(
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
                 alignment: Alignment.center,
@@ -295,7 +305,6 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   },
                 ),
               ),
-              
             ],
           ),
         ),
