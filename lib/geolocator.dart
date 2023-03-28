@@ -6,7 +6,9 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:namer_app/components/show_data_pickup.dart';
 import 'package:namer_app/pages/home.dart';
+import 'package:namer_app/pages/login.dart';
 import 'package:namer_app/pages/sorting_waste.dart';
 import 'components/result_pickup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -95,9 +97,34 @@ class _GenerateLocatorState extends State<GenerateLocator> {
         });
   }
 
+  showModal() {
+    showModalBottomSheet(
+      isDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200.0,
+          color: Colors.white,
+          child: Center(
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text('Data sedang disimpan'),
+              SizedBox(
+                height: 20,
+              ),
+              CircularProgressIndicator()
+            ]),
+          ),
+        );
+      },
+    );
+  }
+
   late String currentDate;
   late String latitude;
   late String longitude;
+  late double distance_first_loc;
+  late double distance_last_loc;
 
   @override
   Widget build(BuildContext context) {
@@ -140,15 +167,17 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                         iconSize: 100,
                         icon: const Icon(
                           Icons.cancel_outlined,
-                          color: Colors.redAccent,
+                          // color: Colors.redAccent,
                         ),
                         onPressed: () async {
+                          showModal();
                           await wastePOST(DateTime.now().toString());
+                          Navigator.of(context).pop();
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                OrganikRecord(),
-                              
+                              builder: (BuildContext context) {
+                                return ConfirmDone();
+                              },
                             ),
                           );
                         },
@@ -157,7 +186,7 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                         iconSize: 100,
                         icon: const Icon(
                           Icons.arrow_circle_right_outlined,
-                          color: Colors.green,
+                          // color: Colors.green,
                         ),
                         onPressed: () async {
                           await _showDialogSuccess();
@@ -195,7 +224,6 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                                 longitude = position.longitude.toString();
                                 loading = false;
                                 addTrashStatus = !addTrashStatus;
-                                // print(addTrashStatus);
                                 location =
                                     '${position.latitude}, ${position.longitude}';
                                 getAddressFromLongLat(position);
@@ -209,6 +237,43 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                           : const Text('Tandai tempat'),
                     ),
                   ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ConfirmDone extends StatelessWidget {
+  const ConfirmDone({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Konfirmasi selesai'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Klik tombol untuk selesai',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: CircleBorder(),
+                padding: EdgeInsets.all(80),
+                backgroundColor: Colors.green,
+              ),
+              child: Text('Selesai'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            )
           ],
         ),
       ),

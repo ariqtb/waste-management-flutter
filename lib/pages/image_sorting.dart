@@ -24,6 +24,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   int selectedIndex = 0;
   late String idWaste;
   final picker = ImagePicker();
+  bool isLoading = false;
 
   Future getImageFromGallery() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -71,15 +72,15 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   List<String> page = ['Anorganik', 'Organik', 'B3', 'Residu'];
 
   Future<void> onGetData() async {
-    if (type != null && 
-    // _imageFile != null && 
-    weightValue != null) {
+    if (type != null &&
+        // _imageFile != null &&
+        weightValue != null) {
       if (photoList.length <= 3) {
-        photoList
-            .add({
-            'typePhoto': type,
-            // 'image': base64Encode(_imageFile!.readAsBytesSync()),
-            'weight': weightValue});
+        photoList.add({
+          'typePhoto': type,
+          // 'image': base64Encode(_imageFile!.readAsBytesSync()),
+          'weight': weightValue
+        });
         if (selectedIndex < 3) {
           setState(() {
             // _imageFile = null;
@@ -90,16 +91,19 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
         }
       } else {
         try {
-            print('${jsonEncode(photoList)}');
+          // print('${jsonEncode(photoList)}');
           // for (var photo in photoList) {
           // }
+          showModal();
+          String databody = jsonEncode(photoList);
           Response response = await put(
-              Uri.parse(
-                  'https://wastemanagement.tubagusariq.repl.co/waste/image-save/${idWaste}'),
-              body: {
-                "id": idWaste,
-                 "image": jsonEncode(photoList)
-                });
+            Uri.parse(
+                'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}'),
+            headers: {'Content-Type': 'application/json'},
+            body: databody,
+          );
+           Navigator.of(context).pop();
+           Navigator.of(context).pop();
           // var request = http.MultipartRequest(
           //     'PUT',
           //     Uri.parse(
@@ -116,10 +120,17 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
           // },
           // body: jsonEncode(photoList));
 
-            print(response.body);
-            print(response.statusCode);
-          if (response.statusCode == 200) {
-          }
+          print(response.body);
+          print(response.statusCode);
+        // Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (BuildContext context) {
+        //       return HistoryPickup();
+        //     },
+        //   ),
+        // );
+
+          if (response.statusCode == 200) {}
         } catch (err) {
           return print(err.toString());
         }
@@ -129,20 +140,12 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
         //         'image': _imageFile,
         //         'weight': weightValue
         //       }
-        // Navigator.of(context).push(
-        //   MaterialPageRoute(
-        //     builder: (BuildContext context) {
-        //       return HistoryPickup();
-        //     },
-        //   ),
-        // );
         print(photoList.length);
-        showModal(context);
       }
     }
   }
 
-  void showModal(BuildContext context) {
+  showModal() {
     showModalBottomSheet(
       isDismissible: false,
       context: context,
@@ -151,7 +154,14 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
           height: 200.0,
           color: Colors.white,
           child: Center(
-            child: Text('Data sedang disimpan'),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text('Data sedang disimpan'),
+              SizedBox(
+                height: 20,
+              ),
+              CircularProgressIndicator()
+            ]),
           ),
         );
       },
@@ -264,7 +274,8 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
                       await onGetData();
                     },
                   )
-                : Container()
+                : Container(),
+                // isLoading ? showModal() : Container(),
           ],
         ),
       ),

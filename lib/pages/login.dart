@@ -41,7 +41,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       Response response = await http.post(
           Uri.parse("https://wastemanagement.tubagusariq.repl.co/login"),
           body: {
-            'email': email,
+            'email': email.toLowerCase(),
             'password': password,
           });
       if (response.statusCode == 200) {

@@ -6,11 +6,12 @@ import 'package:http/http.dart' as http;
 class Location {
   String lat;
   String long;
+  String time;
 
-  Location({required this.lat, required this.long, });
+  Location({required this.lat, required this.long, required this.time});
 
   Map<String, dynamic> location() {
-    return {"lat": lat, "long": long};
+    return {"lat": lat, "long": long, "time": time};
   }
 }
 List<Map<String, dynamic>> waste = [];
@@ -54,7 +55,8 @@ Future wastePOST(String currentDate) async {
     Map<String, dynamic> waste = {
       'pengepul': id_user,
       'date': currentDate,
-      'location': location
+      'location': location,
+      'recorded': false
     };
 
     String bodyParse = jsonEncode(waste);

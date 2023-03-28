@@ -80,14 +80,23 @@ class DetailHistoryPickup extends StatelessWidget {
                 //   ),
                 // ),
                 Container(
-                  padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
-                  decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(
-                    'Telah diproses',
-                    style: TextStyle(color: Colors.white, fontSize: 11),
-                  ),
+                  padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
+                  decoration: history['recorded']
+                      ? BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.green[100])
+                      : BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.redAccent[100]),
+                  child: history['recorded']
+                      ? Text(
+                          'Telah dipilah',
+                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                        )
+                      : Text(
+                          'Belum dipilah',
+                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                        ),
                 ),
                 Text("Daftar riwayat data",
                     style: TextStyle(color: Colors.black, fontSize: 14)),

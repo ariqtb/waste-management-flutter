@@ -84,17 +84,6 @@ class _showDataPickupState extends State<showDataPickup> {
                               )
                               .toList(),
                         ),
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) {
-                                  return GenerateLocator();
-                                },
-                              ),
-                            );
-                          },
-                          child: Text('buka foto')),
                     ],
                   ),
           ),
