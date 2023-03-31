@@ -39,26 +39,25 @@ class _HistoryPickupState extends State<HistoryPickup>
   }
 
   Future<void> fetchData() async {
-    List<dynamic> dataUser = await findUserData();
+    var dataUser = await findUserData();
     String idUser = dataUser[0]['_id'].toString().toLowerCase();
+    print(dataUser);
     final response = await http.get(Uri.parse(
         'https://wastemanagement.tubagusariq.repl.co/waste/user/${idUser}'));
     if (response.statusCode == 200) {
-      // if (data.length == 0) {
-      //   setState(() {
-      //     isEmptyData = true;
-      //     isLoading = true;
-      //   });
-      // }
-
-      setState(() {
-        isLoading = true;
-        data = json.decode(response.body);
-        // data.map((json) => Waste.fromJson(json)).toList();
-        // print(data);
-        data.sort((a, b) =>
-            DateTime.parse(b['date']).compareTo(DateTime.parse(a['date'])));
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+          data = json.decode(response.body);
+          if (data.length == 0) {
+            isEmptyData = true;
+          }
+          // data.map((json) => Waste.fromJson(json)).toList();
+          // print(data);
+          data.sort((a, b) =>
+              DateTime.parse(b['date']).compareTo(DateTime.parse(a['date'])));
+        });
+      }
     } else {
       throw Exception("Failed to load data");
     }
@@ -83,8 +82,8 @@ class _HistoryPickupState extends State<HistoryPickup>
   void onFotoClicked(String id_waste) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: ( context) {
-          return ImagePickerScreen(id_waste : id_waste);
+        builder: (context) {
+          return ImagePickerScreen(id_waste: id_waste);
         },
       ),
     );
@@ -93,8 +92,7 @@ class _HistoryPickupState extends State<HistoryPickup>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-      // String? id_waste;
-
+    // String? id_waste;
 
     return MaterialApp(
       theme: ThemeData(
@@ -109,140 +107,161 @@ class _HistoryPickupState extends State<HistoryPickup>
             ? Center(
                 child: CircularProgressIndicator(),
               )
-            : Container(
-                color: Colors.grey[100],
-                padding: EdgeInsets.all(15),
-                child: ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        elevation: 1,
-                        child: Container(
-                          margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
-                          padding: EdgeInsets.all(15),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Column(
+            : isEmptyData
+                ? Container(
+                    color: Colors.grey[100],
+                    padding: EdgeInsets.all(15),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                      elevation: 1,
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(15),
+                        child: Text('Tidak ada riwayat'),
+                      ),
+                    ),
+                  )
+                : Container(
+                    color: Colors.grey[100],
+                    padding: EdgeInsets.all(15),
+                    child: ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                            elevation: 1,
+                            child: Container(
+                              margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
+                              padding: EdgeInsets.all(15),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
-                                  Text(
-                                    'Selesai',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    "${data[index]['location'].length}",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 35,
-                                        color: Colors.green),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Icon(Icons.location_on_outlined)
-                                ],
-                              ),
-                              // SizedBox(width: 20,),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "${DateFormat('EEE, dd MMMM yy').format(DateTime.parse(data[index]['date']))}",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                      "${DateFormat('HH:mm').format(DateTime.parse(data[index]['date']))}"),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
-                                    decoration: data[index]['recorded']
-                                        ? BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.green[100])
-                                        : BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.redAccent[100]),
-                                    child: data[index]['recorded']
-                                        ? Text(
-                                            'Telah dipilah',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black87),
-                                          )
-                                        : Text(
-                                            'Belum dipilah',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black87),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      onDetailClicked(data[index]);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Colors.green,
-                                    ),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(5),
-                                      child: Text(
-                                        'Detail',
+                                  Column(
+                                    children: [
+                                      Text(
+                                        'Selesai',
+                                        style: TextStyle(fontSize: 12),
                                       ),
-                                    ),
+                                      Text(
+                                        "${data[index]['location'].length}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 35,
+                                            color: Colors.green),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Icon(Icons.location_on_outlined)
+                                    ],
                                   ),
-                                  data[index]['recorded']
-                                      ? Container()
-                                      : ElevatedButton(
-                                          onPressed: () {
-                                            onFotoClicked(data[index]['_id']);
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                              primary: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  side: BorderSide(
-                                                      color: Colors.green))),
-                                          child: Padding(
-                                            padding: EdgeInsets.all(5),
-                                            child: Text(
-                                              'Foto',
-                                              style: TextStyle(
-                                                  color: Colors.green),
-                                            ),
+                                  // SizedBox(width: 20,),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${DateFormat('EEE, dd MMMM yy').format(DateTime.parse(data[index]['date']))}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                          "${DateFormat('HH:mm').format(DateTime.parse(data[index]['date']))}"),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        padding:
+                                            EdgeInsets.fromLTRB(5, 2, 5, 2),
+                                        decoration: data[index]['recorded']
+                                            ? BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.green[100])
+                                            : BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.redAccent[100]),
+                                        child: data[index]['recorded'] && data[index]['image'].length == 4 
+                                            ? Text(
+                                                'Telah dipilah',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black87),
+                                              )
+                                            : Text(
+                                                'Belum dipilah',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black87),
+                                              ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          onDetailClicked(data[index]);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.green,
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(5),
+                                          child: Text(
+                                            'Detail',
                                           ),
                                         ),
-                                  SizedBox(
-                                    height: 5,
+                                      ),
+                                      data[index]['recorded']
+                                          ? Container()
+                                          : ElevatedButton(
+                                              onPressed: () {
+                                                onFotoClicked(
+                                                    data[index]['_id']);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  primary: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                      side: BorderSide(
+                                                          color:
+                                                              Colors.green))),
+                                              child: Padding(
+                                                padding: EdgeInsets.all(5),
+                                                child: Text(
+                                                  'Foto',
+                                                  style: TextStyle(
+                                                      color: Colors.green),
+                                                ),
+                                              ),
+                                            ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      // Text('data')
+                                    ],
                                   ),
-                                  // Text('data')
                                 ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
+                        );
+                      },
+                    ),
+                  ),
       ),
     );
   }

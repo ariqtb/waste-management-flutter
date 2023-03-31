@@ -2,15 +2,12 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:namer_app/pages/history_pickup.dart';
 import '../providers/waste_class.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
-import 'package:async/async.dart';
 
 class ImagePickerScreen extends StatefulWidget {
   final String id_waste;
@@ -43,8 +40,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   }
 
   Future getImageFromCamera() async {
-    final pickedFile =
-        await picker.getImage(source: ImageSource.camera, imageQuality: 20);
+    final pickedFile = await picker.getImage(source: ImageSource.camera, imageQuality: 20);
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
@@ -64,97 +60,45 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
 
   List<String> page = ['Anorganik', 'Organik', 'B3', 'Residu'];
 
-  void itung(File _imageFile) async {
-    // final file = File('/path/to/file');
+void itung(File _imageFile) async {
+  // final file = File('/path/to/file');
 
-    final sizeInBytes = await _imageFile.length();
-    final sizeInKb = sizeInBytes / 1024;
-    print('File size in bytes: $sizeInBytes');
-    print('File size in KB: $sizeInKb');
-  }
-
+  final sizeInBytes = await _imageFile.length();
+  final sizeInKb = sizeInBytes / 1024;
+  print('File size in bytes: $sizeInBytes');
+  print('File size in KB: $sizeInKb');
+}
+  
   Future<void> onGetData() async {
     if (type != null && _imageFile != null && weightValue != null) {
       if (photoList.length <= 3) {
         itung(_imageFile!);
-
-        var stream =
-            http.ByteStream(DelegatingStream.typed(_imageFile!.openRead()));
-        var length = await _imageFile!.length();
-
-        var uri = Uri.parse(
-            'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}');
-        var request = http.MultipartRequest("PUT", uri);
-
-        var multipartFile = http.MultipartFile('image', stream, length,
-            filename: basename(_imageFile!.path));
-
-        request.files.add(multipartFile);
-        request.fields['type'] = type.toString();
-        request.fields['weight'] = weightValue.toString();
-
-        var response = await request.send();
-        print(response.statusCode);
-        var responseBytes = await response.stream.toBytes();
-        var responseString = utf8.decode(responseBytes);
-        print(responseString);
-        // var request = http.MultipartRequest('PUT', Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}'));
-        // var imageFile = http.MultipartFile.fromBytes('image', _imageFile!.readAsBytesSync(), filename: _imageFile!.path.split('/').last);
-        // request.files.add(imageFile);
-        // request.fields['type'] = type.toString();
-        // request.fields['weight'] = weightValue.toString();
-        // var response  = await request.send();
-        // print(request.files);
-
-        // if (response.statusCode == 200) {
-        //   print('success');
-        // }
         photoList.add({
           'typePhoto': type,
-          // 'image': basename(_imageFile!.path),
-          'image': _imageFile,
+          'image': base64Encode(_imageFile!.readAsBytesSync()),
           'weight': weightValue
         });
         if (selectedIndex < 3) {
           setState(() {
             _imageFile = null;
             weightValue = null;
-            print('photoList.length');
+            print(photoList.length);
             selectedIndex++;
           });
         }
       } else {
         try {
-          // print(photoList[3]['image'].path);
-          //   for (var element in photoList) {
-          //     print(element['image'].path);
-          //   }
-          // print('oy');
-          // var stream =
-          //     http.ByteStream(DelegatingStream.typed(_imageFile!.openRead()));
-          // var length = await _imageFile!.length();
-          // for (int i = 0; i < photoList.length; i++) {
-          // var uri = Uri.parse(
-          //     'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}');
-          // var request = http.MultipartRequest("PUT", uri);
-          //   var multipartFile = http.MultipartFile('image', stream, length,
-          //       filename: basename(photoList[i]['image']!.path));
-          // print('baris $i');
-          //   request.fields['type'] = type!;
-          //   request.fields['weight'] = weightValue!.toString();
-          //   request.files.add(multipartFile);
-          //   var response = await request.send();
-          // }
           // print('${jsonEncode(photoList)}');
           // for (var photo in photoList) {
           // }
-          // String databody = jsonEncode(photoList);
-          // Response response = await put(
-          //   Uri.parse(
-          //       'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}'),
-          //   headers: {'Content-Type': 'application/json'},
-          //   body: databody,
-          // );
+          showModal();
+          String databody = jsonEncode(photoList);
+          Response response = await put(
+            Uri.parse(
+                'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}'),
+            headers: {'Content-Type': 'application/json'},
+            body: databody,
+          );
           // Navigator.of(context).pop();
           // Navigator.of(context).pop();
 
@@ -175,8 +119,8 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
           // },
           // body: jsonEncode(photoList));
 
-          // print(response.body);
-          // print(response.statusCode);
+          print(response.body);
+          print(response.statusCode);
           // Navigator.of(context).push(
           //   MaterialPageRoute(
           //     builder: (BuildContext context) {
@@ -185,7 +129,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
           //   ),
           // );
 
-          // if (response.statusCode == 200) {}
+          if (response.statusCode == 200) {}
         } catch (err) {
           return print(err.toString());
         }
@@ -202,15 +146,14 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
 
   Future<http.Response> uploadImages(
       List<File> images, List<int> weights) async {
-    var uri = Uri.parse(
-        'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/$idWaste');
+    var uri = Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/imagesave/$idWaste');
 
     var request = http.MultipartRequest('POST', uri);
     for (int i = 0; i < images.length; i++) {
       var stream = http.ByteStream(images[i].openRead());
       var length = await images[i].length();
-      var multipartFile =
-          http.MultipartFile('image', stream, length, filename: 'image$i.jpg');
+      var multipartFile = http.MultipartFile('image', stream, length,
+          filename: 'image$i.jpg');
       request.files.add(multipartFile);
       request.fields['weights[$i]'] = weights[i].toString();
     }
@@ -219,28 +162,28 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
     return await http.Response.fromStream(response);
   }
 
-  // showModal() {
-  //   showModalBottomSheet(
-  //     isDismissible: false,
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Container(
-  //         height: 200.0,
-  //         color: Colors.white,
-  //         child: Center(
-  //           child:
-  //               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-  //             Text('Data sedang disimpan'),
-  //             SizedBox(
-  //               height: 20,
-  //             ),
-  //             CircularProgressIndicator()
-  //           ]),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+  showModal() {
+    showModalBottomSheet(
+      isDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200.0,
+          color: Colors.white,
+          child: Center(
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text('Data sedang disimpan'),
+              SizedBox(
+                height: 20,
+              ),
+              CircularProgressIndicator()
+            ]),
+          ),
+        );
+      },
+    );
+  }
 
   Future<void> onPushData() async {}
 
@@ -339,7 +282,8 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
             SizedBox(
               height: 50,
             ),
-            weightValue != null && selectedIndex < 4 && _imageFile != null
+            weightValue != null && selectedIndex < 4
+                 && _imageFile != null
                 ? ElevatedButton(
                     child: Text('Lanjut'),
                     onPressed: () async {

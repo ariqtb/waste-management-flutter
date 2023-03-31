@@ -18,11 +18,11 @@ class _showDataPickupState extends State<showDataPickup> {
     final response = await http
         .get(Uri.parse('https://wastemanagement.tubagusariq.repl.co/produsen'));
     if (response.statusCode == 200) {
-      if(mounted){
-      setState(() {
-        isLoading = true;
-        data = json.decode(response.body);
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+          data = json.decode(response.body);
+        });
       }
       print(data[0]['_id']);
     } else {
@@ -60,30 +60,45 @@ class _showDataPickupState extends State<showDataPickup> {
                 : Column(
                     // mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (data.isNotEmpty)
-                        Column(
-                          children: data
-                              .map(
-                                (item) => ListTile(
-                                  leading: CircleAvatar(
-                                    child: Text('${data.indexOf(item) + 1}'),
-                                  ),
-                                  title: Text("${item['date']}"),
-                                  // subtitle: Text(item['date']),
-                                  trailing: Icon(Icons.arrow_forward),
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) {
-                                          return GenerateLocator();
-                                        },
+                      data.isNotEmpty
+                          ? Column(
+                              children: data
+                                  .map(
+                                    (item) => ListTile(
+                                      leading: CircleAvatar(
+                                        child:
+                                            Text('${data.indexOf(item) + 1}'),
                                       ),
-                                    );
-                                  },
+                                      title: Text("${item['user'][0]['name']}"),
+                                      subtitle: Text(item['date']),
+                                      trailing: Icon(Icons.arrow_forward),
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) {
+                                              return GenerateLocator();
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  )
+                                  .toList(),
+                            )
+                          : Container(
+                              color: Colors.grey[100],
+                              padding: EdgeInsets.all(15),
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)),
+                                elevation: 1,
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.all(15),
+                                  child: Text('Tidak ada riwayat'),
                                 ),
-                              )
-                              .toList(),
-                        ),
+                              ),
+                            ),
                     ],
                   ),
           ),
