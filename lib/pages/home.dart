@@ -52,54 +52,6 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   var selectedIndex = 0;
 
-  Future<bool> onWillPop() async {
-    // return (
-    //   await showDialog<bool>(
-    //         context: context,
-    //         builder: (context) => AlertDialog(
-    //               title: Text('Konfirmasi'),
-    //               content: Text('Apakah anda ingin keluar?'),
-    //               actions: [
-    //                 ElevatedButton(
-    //                   onPressed: () => Navigator.of(context).pop(false),
-    //                   child: const Text('Tidak'),
-    //                 ),
-    //                 ElevatedButton(
-    //                   onPressed: () {
-    //                     Navigator.of(context).pop(true);
-    //                     Navigator.of(context).push(
-    //                       MaterialPageRoute(
-    //                         builder: (context) => MyStatefulWidget(),
-    //                       ),
-    //                     );
-    //                   },
-    //                   child: const Text('Ya'),
-    //                 ),
-    //               ],
-    //             ))
-    //             ) ??
-    //     false;
-    // return (await showDialog<bool>(
-    //         context: context,
-    //         builder: (context) => AlertDialog(
-    //               title: Text('Konfirmasi'),
-    //               content: Text('Apakah anda ingin keluar?'),
-    //               actions: [
-    //                 TextButton(
-    //                   onPressed: () => Navigator.of(context).pop(true),
-    //                   child: const Text('Tidak'),
-    //                 ),
-    //                 TextButton(
-    //                   onPressed: () {
-    //                     Navigator.of(context).pop(true);
-    //                   },
-    //                   child: const Text('Ya'),
-    //                 ),
-    //               ],
-    //             ))) ??
-    return false;
-  }
-
   Future<bool> dialog() async {
     AlertDialog(
       actions: [
@@ -132,7 +84,7 @@ class _DashboardState extends State<Dashboard> {
               TextButton(
                   onPressed: () {
                     Navigator.pop(context, true);
-                    // Navigator.pop(context, true);
+                    Navigator.pop(context, true);
                   },
                   child: Text('Ya')),
             ],
@@ -159,18 +111,31 @@ class _DashboardState extends State<Dashboard> {
       },
       child: Scaffold(
         body: page,
-        bottomNavigationBar: NavigationBar(
-            destinations: [
-              NavigationDestination(
-                  icon: Icon(Icons.home), label: "Daftar Pickup"),
-              NavigationDestination(
-                  icon: Icon(Icons.history), label: "Riwayat"),
-            ],
-            onDestinationSelected: (value) {
-              setState(() {
-                selectedIndex = value;
-              });
-            }),
+        bottomNavigationBar: 
+        
+        NavigationBarTheme(
+          data: NavigationBarThemeData(
+            indicatorColor: Colors.green[100],
+            labelTextStyle: MaterialStateProperty.all(
+             TextStyle(fontSize: 10, fontWeight: FontWeight.w500) 
+            )
+          ),
+          child: NavigationBar(
+              destinations: [
+                NavigationDestination(
+                    icon: Icon(Icons.home), label: "Daftar Pickup"),
+                NavigationDestination(
+                    icon: Icon(Icons.history), label: "Riwayat"),
+              ],
+              // height: 65,
+              // labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (value) {
+                setState(() {
+                  selectedIndex = value;
+                });
+              }),
+        ),
       ),
     );
   }
