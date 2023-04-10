@@ -43,7 +43,7 @@ class _HistoryPickupState extends State<HistoryPickup>
     String idUser = dataUser[0]['_id'].toString().toLowerCase();
     print(dataUser);
     final response = await http.get(Uri.parse(
-        'https://wastemanagement.tubagusariq.repl.co/waste/user/${idUser}'));
+        'https://waste.tubagusariq.repl.co/waste/user/${idUser}'));
     if (response.statusCode == 200) {
       if (mounted) {
         setState(() {

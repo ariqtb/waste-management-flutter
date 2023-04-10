@@ -16,7 +16,7 @@ class _showDataPickupState extends State<showDataPickup> {
 
   Future<void> fetchData() async {
     final response = await http
-        .get(Uri.parse('https://wastemanagement.tubagusariq.repl.co/produsen'));
+        .get(Uri.parse('https://waste.tubagusariq.repl.co/produsen'));
     if (response.statusCode == 200) {
       if (mounted) {
         setState(() {

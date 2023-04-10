@@ -29,6 +29,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   final picker = ImagePicker();
   bool isLoading = false;
   List<int> bytesPhoto = [];
+  bool isDone = false;
 
   Future getImageFromGallery() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -65,8 +66,6 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   List<String> page = ['Anorganik', 'Organik', 'B3', 'Residu'];
 
   void itung(File _imageFile) async {
-    // final file = File('/path/to/file');
-
     final sizeInBytes = await _imageFile.length();
     final sizeInKb = sizeInBytes / 1024;
     print('File size in bytes: $sizeInBytes');
@@ -83,14 +82,14 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
         var length = await _imageFile!.length();
 
         var uri = Uri.parse(
-            'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}');
+            'https://waste.tubagusariq.repl.co/waste/imagesave/${idWaste}');
         var request = http.MultipartRequest("PUT", uri);
 
         var multipartFile = http.MultipartFile('image', stream, length,
             filename: basename(_imageFile!.path));
 
         request.files.add(multipartFile);
-        request.fields['type'] = type.toString();
+        request.fields['typePhoto'] = type.toString();
         request.fields['weight'] = weightValue.toString();
 
         var response = await request.send();
@@ -98,104 +97,23 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
         var responseBytes = await response.stream.toBytes();
         var responseString = utf8.decode(responseBytes);
         print(responseString);
-        // var request = http.MultipartRequest('PUT', Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}'));
-        // var imageFile = http.MultipartFile.fromBytes('image', _imageFile!.readAsBytesSync(), filename: _imageFile!.path.split('/').last);
-        // request.files.add(imageFile);
-        // request.fields['type'] = type.toString();
-        // request.fields['weight'] = weightValue.toString();
-        // var response  = await request.send();
-        // print(request.files);
 
-        // if (response.statusCode == 200) {
-        //   print('success');
-        // }
-        photoList.add({
-          'typePhoto': type,
-          // 'image': basename(_imageFile!.path),
-          'image': _imageFile,
-          'weight': weightValue
-        });
-        if (selectedIndex < 3) {
+        photoList.add(
+            {'typePhoto': type, 'image': _imageFile, 'weight': weightValue});
+
+        if(photoList.length == 4) {
           setState(() {
-            _imageFile = null;
-            weightValue = null;
-            print('photoList.length');
-            selectedIndex++;
+            isDone = true;
           });
+          return null;
         }
-      } else {
-        try {
-          // print(photoList[3]['image'].path);
-          //   for (var element in photoList) {
-          //     print(element['image'].path);
-          //   }
-          // print('oy');
-          // var stream =
-          //     http.ByteStream(DelegatingStream.typed(_imageFile!.openRead()));
-          // var length = await _imageFile!.length();
-          // for (int i = 0; i < photoList.length; i++) {
-          // var uri = Uri.parse(
-          //     'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}');
-          // var request = http.MultipartRequest("PUT", uri);
-          //   var multipartFile = http.MultipartFile('image', stream, length,
-          //       filename: basename(photoList[i]['image']!.path));
-          // print('baris $i');
-          //   request.fields['type'] = type!;
-          //   request.fields['weight'] = weightValue!.toString();
-          //   request.files.add(multipartFile);
-          //   var response = await request.send();
-          // }
-          // print('${jsonEncode(photoList)}');
-          // for (var photo in photoList) {
-          // }
-          // String databody = jsonEncode(photoList);
-          // Response response = await put(
-          //   Uri.parse(
-          //       'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/${idWaste}'),
-          //   headers: {'Content-Type': 'application/json'},
-          //   body: databody,
-          // );
-          // Navigator.of(context).pop();
-          // Navigator.of(context).pop();
 
-          // var request = http.MultipartRequest(
-          //     'PUT',
-          //     Uri.parse(
-          //         'https://wastemanagement.tubagusariq.repl.co/waste/image-save/${idWaste}'));
-
-          // request.fields['type'] = type;
-          // request.fields['weight'] = weightValue;
-          // request.files.add(http.MultipartFile.fromBytes('image', bytesPhoto,
-          //     filename: _imageFile));
-
-          // Uri.parse(
-          //     ),
-          // headers: <String, String>{
-          //   'Content-Type': 'application/octet-stream'
-          // },
-          // body: jsonEncode(photoList));
-
-          // print(response.body);
-          // print(response.statusCode);
-          // Navigator.of(context).push(
-          //   MaterialPageRoute(
-          //     builder: (BuildContext context) {
-          //       return HistoryPickup();
-          //     },
-          //   ),
-          // );
-
-          // if (response.statusCode == 200) {}
-        } catch (err) {
-          return print(err.toString());
-        }
-        // selectedIndex++;
-        // {
-        //         'type': type,
-        //         'image': _imageFile,
-        //         'weight': weightValue
-        //       }
-        print(photoList.length);
+        setState(() {
+          _imageFile = null;
+          weightValue = null;
+          print('photoList.length');
+          selectedIndex++;
+        });
       }
     }
   }
@@ -203,7 +121,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   Future<http.Response> uploadImages(
       List<File> images, List<int> weights) async {
     var uri = Uri.parse(
-        'https://wastemanagement.tubagusariq.repl.co/waste/imagesave/$idWaste');
+        'https://waste.tubagusariq.repl.co/waste/imagesave/$idWaste');
 
     var request = http.MultipartRequest('POST', uri);
     for (int i = 0; i < images.length; i++) {
@@ -219,28 +137,30 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
     return await http.Response.fromStream(response);
   }
 
-  // showModal() {
-  //   showModalBottomSheet(
-  //     isDismissible: false,
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Container(
-  //         height: 200.0,
-  //         color: Colors.white,
-  //         child: Center(
-  //           child:
-  //               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-  //             Text('Data sedang disimpan'),
-  //             SizedBox(
-  //               height: 20,
-  //             ),
-  //             CircularProgressIndicator()
-  //           ]),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+  showModal(context) {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+    showModalBottomSheet(
+      isDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200.0,
+          color: Colors.white,
+          child: Center(
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text('Data sedang disimpan'),
+              SizedBox(
+                height: 20,
+              ),
+              CircularProgressIndicator()
+            ]),
+          ),
+        );
+      },
+    );
+  }
 
   Future<void> onPushData() async {}
 
@@ -279,8 +199,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
       // break;
     }
     // type = 'anorganik';
-    List<double> items =
-        List<double>.generate(50, (index) => index + 1 / 2.toDouble());
+    List<double> items = List<double>.generate(50, (index) => index + 5);
 
     return Scaffold(
       appBar: AppBar(
@@ -345,10 +264,13 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
                     onPressed: () async {
                       // if()
                       await onGetData();
+                      if(isDone == true) {
+                        Navigator.of(context).pop();
+                      }
                     },
                   )
                 : Container(),
-            // isLoading ? showModal() : Container(),
+            isLoading ? showModal(context) : Container(),
           ],
         ),
       ),

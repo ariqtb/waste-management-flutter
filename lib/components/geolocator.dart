@@ -22,7 +22,7 @@ Future<void> addWaste(String currentDate, latitude, longitude) async {
   String? email = prefs.getString('email');
   try {
     location.add({"lat": latitude, "long": longitude, "time": currentDate});
-    print(location);
+    // print(location);
   } catch (e) {
     throw Exception(e);
   }
@@ -34,7 +34,7 @@ Future findUserData() async {
 
   try {
     Response response = await http.get(Uri.parse(
-        'https://wastemanagement.tubagusariq.repl.co/users/${email}'));
+        'https://waste.tubagusariq.repl.co/users/${email}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -63,12 +63,14 @@ Future wastePOST(String currentDate) async {
     await prefs.setString('waste', bodyParse);
     // return print(bodyParse);
     Response response = await http.post(
-        Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/add'),
+        Uri.parse('https://waste.tubagusariq.repl.co/waste/add'),
         headers: {'Content-Type': 'application/json'},
         body: bodyParse);
     if (response.statusCode == 201) {
       location.clear();
-      print(waste);
+      // print(waste);
+      // print(waste);
+      // return waste;
       // print('success');
       // print(response.body);
     } else {

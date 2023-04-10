@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:namer_app/pages/irt/home.dart';
+import 'package:namer_app/pages/irt/homepage/homepage.dart';
+import 'package:namer_app/pages/petugas/homepage.dart';
 import 'package:namer_app/pages/register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart';
@@ -40,7 +43,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     final prefs = await SharedPreferences.getInstance();
     try {
       Response response = await http.post(
-          Uri.parse("https://wastemanagement.tubagusariq.repl.co/login"),
+          Uri.parse("https://waste.tubagusariq.repl.co/login"),
           body: {
             'email': email.toLowerCase(),
             'password': password,
@@ -72,15 +75,23 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) {
-            return Dashboard();
+            return GenerateLocator();
           },
         ),
       );
-    } else if (role == 'irt') {
+    } else if (role == 'produsen') {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) {
-            return RegisterWidget();
+            return HomeIrt();
+          },
+        ),
+      );
+    } else if (role == 'petugastps') {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) {
+            return HomepagePetugas();
           },
         ),
       );
@@ -225,7 +236,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                             passwordController.text.toString());
                         if (logged == true) {
                           await checkRoleIfLogin();
-                          _showDialogSuccess();
+                          // setState(() {
+                          //   loading = false;
+                          // });
+                          // await _showDialogSuccess();
                           // Navigator.pushAndRemoveUntil(
                           //     context,
                           //     MaterialPageRoute(builder: (context) => HomePage()),

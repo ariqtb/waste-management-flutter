@@ -35,8 +35,8 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   final addressController = TextEditingController();
   final handphoneController = TextEditingController();
   final roleController = TextEditingController();
-  List<String> role = ['irt', 'pengepul', 'petugas'];
-  String? roleSelected;
+  final roleList = ['IRT', 'Pengepul', 'Petugas TPS'];
+  String roleSelected = "Pengepul";
 
   bool loading = false;
   bool logged = false;
@@ -78,7 +78,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
     } else {
       try {
         Response response = await post(
-            Uri.parse("https://wastemanagement.tubagusariq.repl.co/register"),
+            Uri.parse("https://waste.tubagusariq.repl.co/register"),
             body: {
               'name': nameController.text.trim(),
               'address': addressController.text.trim(),
@@ -86,9 +86,9 @@ class _RegisterWidgetState extends State<RegisterWidget> {
               'password': passwordController.text.trim(),
               'verPassword': password2Controller.text.trim(),
               'handphone': handphoneController.text.trim(),
-              'role': 'pengepul',
+              'role': roleSelected.toLowerCase(),
             });
-        if (response.statusCode == 200) {
+        if (response.statusCode == 201) {
           print(response.body);
           print(response.statusCode);
           // return _showDialogSuccess();
@@ -211,29 +211,36 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: TextFormField(
-                  obscureText: true,
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                    // errorText: _errorText,
+              Row(
+                children: [
+                  Container(
+                    child: Expanded(
+                      child: TextFormField(
+                        obscureText: true,
+                        controller: passwordController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Password',
+                          // errorText: _errorText,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: TextFormField(
-                  obscureText: true,
-                  controller: password2Controller,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Konfirmasi Password',
-                    // errorText: _errorText,
+                  SizedBox(width: 10,),
+                  Container(
+                    child: Expanded(
+                      child: TextFormField(
+                        obscureText: true,
+                        controller: password2Controller,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Konfirmasi Password',
+                          // errorText: _errorText,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -262,12 +269,28 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   ),
                 ),
               ),
-              // Container(
-              //   child: DropdownButton(
-              //     value: roleSelected,
-              //     items: role.map((String value) => DropdownMenuItem(child: child))
-              //   ),
-              // ),
+              Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                  child: DropdownButtonFormField<String>(
+                    decoration: InputDecoration(labelText: 'Role'),
+                    value: roleSelected,
+                    onChanged: (val) {
+                      setState(() {
+                        roleSelected = val!;
+                      });
+                    },
+                    items: roleList
+                        .map((e) => DropdownMenuItem(
+                              child: Text(e),
+                              value: e,
+                            ))
+                        .toList(),
+                    icon:
+                        Icon(Icons.arrow_drop_down_circle, color: Colors.green),
+                  )),
               Container(
                   padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
                   height: 65,
@@ -300,8 +323,9 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                 child: OutlinedButton(
                   child: Text('Login'),
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => const MyApp()));
+                    // Navigator.push(context,
+                    //     MaterialPageRoute(builder: (context) => const MyApp()));
+                    Navigator.of(context).pop();
                   },
                 ),
               ),
