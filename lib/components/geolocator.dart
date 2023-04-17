@@ -22,7 +22,21 @@ Future<void> addWaste(String currentDate, latitude, longitude) async {
   String? email = prefs.getString('email');
   try {
     location.add({"lat": latitude, "long": longitude, "time": currentDate});
-    // print(location);
+    print(location);
+    // print(location.runtimeType);
+
+  } catch (e) {
+    throw Exception(e);
+  }
+}
+
+Future<void> stopWaste() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? email = prefs.getString('email');
+  try {
+    await prefs.setString('location', jsonEncode(location));
+    location.clear();
+    // print(location.runtimeType);
   } catch (e) {
     throw Exception(e);
   }
@@ -62,21 +76,21 @@ Future wastePOST(String currentDate) async {
     String bodyParse = jsonEncode(waste);
     await prefs.setString('waste', bodyParse);
     // return print(bodyParse);
-    Response response = await http.post(
-        Uri.parse('https://waste.tubagusariq.repl.co/waste/add'),
-        headers: {'Content-Type': 'application/json'},
-        body: bodyParse);
-    if (response.statusCode == 201) {
-      location.clear();
-      // print(waste);
-      // print(waste);
-      // return waste;
-      // print('success');
-      // print(response.body);
-    } else {
-      print(response.body);
-      print(response.statusCode);
-    }
+    // Response response = await http.post(
+    //     Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/add'),
+    //     headers: {'Content-Type': 'application/json'},
+    //     body: bodyParse);
+    // if (response.statusCode == 201) {
+    //   location.clear();
+    //   // print(waste);
+    //   // print(waste);
+    //   // return waste;
+    //   // print('success');
+    //   // print(response.body);
+    // } else {
+    //   print(response.body);
+    //   print(response.statusCode);
+    // }
   } catch (e) {
     throw Exception(e);
   }

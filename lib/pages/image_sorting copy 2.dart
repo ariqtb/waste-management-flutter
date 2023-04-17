@@ -10,13 +10,11 @@ import '../providers/waste_class.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
-import 'package:path/path.dart' as path;
 import 'package:async/async.dart';
-import 'recap_image.dart';
 
 class ImagePickerScreen extends StatefulWidget {
-  final Map<String, dynamic> datas;
-  ImagePickerScreen({required this.datas});
+  final String id_waste;
+  ImagePickerScreen({this.id_waste = ''});
 
   @override
   _ImagePickerScreenState createState() => _ImagePickerScreenState();
@@ -32,8 +30,6 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   bool isLoading = false;
   List<int> bytesPhoto = [];
   bool isDone = false;
-  Map<String, String> filesInfo = {};
-  Map<String, dynamic> wasteData = {};
 
   Future getImageFromGallery() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -67,7 +63,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   List<ResiduObj> residu = [];
   List<Map<String, dynamic>> photoList = [];
 
-  List<String> page = ['Anorganik', 'Organik', 'B3', 'Residu', 'Done'];
+  List<String> page = ['Anorganik', 'Organik', 'B3', 'Residu'];
 
   void itung(File _imageFile) async {
     final sizeInBytes = await _imageFile.length();
@@ -107,7 +103,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
         photoList.add(
             {'typePhoto': type, 'image': _imageFile, 'weight': weightValue});
 
-        if (photoList.length == 4) {
+        if(photoList.length == 4) {
           setState(() {
             isDone = true;
           });
@@ -120,99 +116,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
           print('photoList.length');
           selectedIndex++;
         });
-        if (selectedIndex == 4) {
-          await getImageData();
-        }
       }
-    }
-  }
-
-  Future<void> getImageData() async {
-    if (_imageFile != null) {
-      // String filename = basename(_imageFile!.path);
-
-      photoList.add(
-          {'typePhoto': type, 'filename': _imageFile, 'weight': weightValue});
-    }
-    setState(() {
-      _imageFile = null;
-      weightValue = null;
-      print('photoList.length');
-      print(photoList.length);
-      print(photoList);
-      selectedIndex++;
-    });
-  }
-
-  Future<void> uploadData(Map<String, dynamic> datas) async {
-    // return print(datas['recorded']);
-    // try {
-    //   var response = await post(
-    //       Uri.parse("https://wastemanagement.tubagusariq.repl.co/waste/save"),
-    //       body: jsonEncode(datas));
-    //   if (response.statusCode == 200) {
-    //     print(response.body);
-    //     print(response.statusCode);
-    //     // return _showDialogSuccess();
-    //   } else {
-    //     print('error deh ${response.statusCode}');
-    //   }
-    // } catch (e) {
-    //   return print(e.toString());
-    // }
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('https://waste.tubagusariq.repl.co/waste/save'));
-
-    // request.fields['pengepul'] = datas['pengepul'];
-    // request.fields['date'] = datas['date'];
-    // String location = jsonEncode(datas['location']);
-    var i = 0;
-    for (var fileInfo in photoList) {
-      final file = fileInfo['filename'];
-      var stream = http.ByteStream(DelegatingStream(file.openRead()));
-      var length = await file.length();
-      var multipartFile = http.MultipartFile('photo', stream, length,
-          filename: basename(file.path));
-      request.files.add(multipartFile);
-      i++;
-    }
-    ;
-
-    request.headers['Content-Type'] = 'application/json';
-    List<dynamic> imageMap = [];
-
-    for (var getInfo in photoList) {
-      String filename = getInfo['filename'].path.split('/').last;
-      imageMap.add({
-        'typePhoto': getInfo['typePhoto'],
-        'filename': filename,
-        'weight': getInfo['weight']
-      });
-    }
-
-    request.fields.addAll({
-      'pengepul': datas['pengepul'],
-      'date': datas['date'],
-      'location': jsonEncode(datas['location']),
-      'image': jsonEncode(imageMap),
-      'recorded': datas['recorded'].toString()
-    });
-
-    final response = await request.send();
-
-    setState(() {
-      isDone = true;
-    });
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      print('Photos and data uploaded successfully ${response.statusCode}');
-      // var responseString = (responseBytes);
-      var responseBytes = await http.Response.fromStream(response);
-      print(responseBytes.body);
-    } else {
-      print('Failed to upload photos and data: ${response.statusCode}');
-      var responseBytes = await http.Response.fromStream(response);
-      print(responseBytes.body);
     }
   }
 
@@ -236,8 +140,8 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   }
 
   showModal(context) {
-    Navigator.of(context).pop();
-    Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
     showModalBottomSheet(
       isDismissible: false,
       context: context,
@@ -260,15 +164,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
     );
   }
 
-  toNextPage(context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return SubmitPage();
-        },
-      ),
-    );
-  }
+  Future<void> onPushData() async {}
 
   Future<void> onEachPage(int index) async {
     if (index >= 3) {
@@ -279,8 +175,8 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   @override
   void initState() {
     super.initState();
-    wasteData = widget.datas;
-    // print(idWaste);
+    idWaste = widget.id_waste;
+    print(idWaste);
     onEachPage(selectedIndex);
   }
 
@@ -299,16 +195,13 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
       case 3:
         type = 'residu';
         break;
-      case 4:
-        type = 'done';
-        break;
       default:
         throw UnimplementedError('No Page Anymore');
       // selectedIndex = 0;
       // break;
     }
     // type = 'anorganik';
-    List<double> items = List<double>.generate(50, (index) => index + 5);
+    List<double> items = List<double>.generate(50, (index) => 5);
 
     return Scaffold(
       appBar: AppBar(
@@ -371,21 +264,11 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
                 ? ElevatedButton(
                     child: Text('Lanjut'),
                     onPressed: () async {
-                      // print(photoList.length);
-                      if (photoList.length <= 3) {
-                        await getImageData();
+                      // if()
+                      await onGetData();
+                      if(isDone == true) {
+                        Navigator.of(context).pop();
                       }
-                      print('oy');
-                      if (photoList.length >= 4) {
-                        await uploadData(wasteData);
-                        toNextPage(context);
-                        setState(() {
-                          isDone = true;
-                        });
-                      }
-                      // if (isDone == true) {
-                      //   Navigator.of(context).pop();
-                      // }
                     },
                   )
                 : Container(),

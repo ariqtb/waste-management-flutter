@@ -78,7 +78,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
     } else {
       try {
         Response response = await post(
-            Uri.parse("https://waste.tubagusariq.repl.co/register"),
+            Uri.parse("https://wastemanagement.tubagusariq.repl.co/register"),
             body: {
               'name': nameController.text.trim(),
               'address': addressController.text.trim(),
@@ -91,7 +91,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         if (response.statusCode == 201) {
           print(response.body);
           print(response.statusCode);
-          // return _showDialogSuccess();
+          return _showDialogSuccess();
         } else {
           return _showDialogError(response.body.toString());
         }

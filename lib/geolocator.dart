@@ -219,7 +219,7 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                               waste =
                                   await wastePOST(DateTime.now().toString());
                             }
-
+                            await stopWaste();
                             setState(() {
                               loading = false;
                             });
@@ -240,7 +240,7 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                             );
                             // Navigator.of(context).pop();
                             setState(() {
-                              print(loading);
+                              // print(loading);
                               info = infoclone;
                               count = 0;
                               addTrashStatus = false;
@@ -259,6 +259,7 @@ class _GenerateLocatorState extends State<GenerateLocator> {
                               addTrashStatus = false;
                               info = infoclone;
                             });
+
                             // Navigator.of(context).push(
                             //   MaterialPageRoute(
                             //     builder: (BuildContext context) {

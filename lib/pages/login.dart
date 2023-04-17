@@ -42,12 +42,11 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   Future<void> loginFunc(String email, password) async {
     final prefs = await SharedPreferences.getInstance();
     try {
-      Response response = await http.post(
-          Uri.parse("https://waste.tubagusariq.repl.co/login"),
-          body: {
-            'email': email.toLowerCase(),
-            'password': password,
-          });
+      Response response = await http
+          .post(Uri.parse("https://waste.tubagusariq.repl.co/login"), body: {
+        'email': email.toLowerCase(),
+        'password': password,
+      });
       if (response.statusCode == 200) {
         await prefs.setString('email', email);
         final bodyParsed = json.decode(response.body.toLowerCase());

@@ -19,7 +19,7 @@ class _ResultPickupState extends State<ResultPickup> {
     List<dynamic> data_user = await findUserData();
     String id_user = data_user[0]['_id'].toString().toLowerCase();
     final response = await http
-        .get(Uri.parse('https://waste.tubagusariq.repl.co/waste/user/${id_user}'));
+        .get(Uri.parse('https://wastemanagement.tubagusariq.repl.co/waste/user/${id_user}'));
     if (response.statusCode == 200) {
       setState(() {
         isLoading = true;

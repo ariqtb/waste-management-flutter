@@ -43,7 +43,7 @@ class _HistoryPickupState extends State<HistoryPickup>
     String idUser = dataUser[0]['_id'].toString().toLowerCase();
     print(dataUser);
     final response = await http.get(Uri.parse(
-        'https://waste.tubagusariq.repl.co/waste/user/${idUser}'));
+        'https://wastemanagement.tubagusariq.repl.co/waste/user/${idUser}'));
     if (response.statusCode == 200) {
       if (mounted) {
         setState(() {
@@ -79,15 +79,15 @@ class _HistoryPickupState extends State<HistoryPickup>
     );
   }
 
-  void onFotoClicked(String id_waste) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return ImagePickerScreen(id_waste: id_waste);
-        },
-      ),
-    );
-  }
+  // void onFotoClicked(String id_waste) {
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (context) {
+  //         return ImagePickerScreen(id_waste: id_waste);
+  //       },
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -227,8 +227,8 @@ class _HistoryPickupState extends State<HistoryPickup>
                                           ? Container()
                                           : ElevatedButton(
                                               onPressed: () {
-                                                onFotoClicked(
-                                                    data[index]['_id']);
+                                                // onFotoClicked(
+                                                //     data[index]['_id']);
                                               },
                                               style: ElevatedButton.styleFrom(
                                                   primary: Colors.white,

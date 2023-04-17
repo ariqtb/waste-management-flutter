@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:namer_app/pages/image_sorting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class RecapPickup extends StatefulWidget {
   // final Map<dynamic, String> waste;
@@ -17,27 +19,45 @@ class RecapPickup extends StatefulWidget {
 class _RecapPickupState extends State<RecapPickup> {
   Map<String, dynamic>? datas;
   List<Map<String, dynamic>>? wasteData;
-  List<Map<String, dynamic>>? location;
-  
+  List<Map<String, dynamic>> location = [];
 
   getRecap() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     String? getdata = prefs.getString('waste');
+
     setState(() {
       datas = jsonDecode(getdata!);
     });
     print(datas.runtimeType);
+    print(datas);
 
     wasteData = [datas!].toList();
-    
+
     // print(wasteData![0]['location']);
-    setState(() {
-      location = wasteData![0]['location'];
+    // setState(() {
+    //   location = wasteData![0]['location'].map((item) => item as Map<String, dynamic>).toList();
+    // });
+
+    // List<Map<String, dynamic>> test = datas!['location'].map((item) => item as Map<String, dynamic>).toList();
+    // List<Map<String, dynamic>> test =
+    //     datas!['location'].map((item) => item as Map<String, dynamic>).toList();
+
+    List<Map<String, dynamic>> test = [];
+
+    datas!['location'].forEach((item) {
+      test.add(Map<String, dynamic>.from(item));
     });
-    
-    print(location);
-    print(location.runtimeType);
+
+    setState(() {
+      location = test;
+    });
+
+    // print(test);
+    // print(test.runtimeType);
+    // print(datas);
+    // print(datas!['location'].runtimeType);
+    // print(location.runtimeType);
   }
 
   @override
@@ -65,22 +85,50 @@ class _RecapPickupState extends State<RecapPickup> {
         padding: EdgeInsets.all(20),
         alignment: Alignment.topCenter,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Text('data'),
+            Text(
+              'Jumlah: ${location.length}',
+              style: TextStyle(
+                fontSize: 13,
+              ),
+            ),
             Container(
               child: DataTable(
                 columns: [
-                  DataColumn(label: Text('Nama')),
-                  DataColumn(label: Text('Waktu')),
+                  DataColumn(label: Text('Jam')),
+                  DataColumn(label: Text('Tanggal')),
                   DataColumn(label: Text('Alamat')),
                 ],
-                rows: data.map((e) {
+                rows: location.map((e) {
                   return DataRow(cells: [
-                    DataCell(Text(e['Name'])),
-                    DataCell(Text(e['Age'].toString())),
-                    DataCell(Text(e['Role'])),
+                    DataCell(Text(
+                        "${DateFormat('HH:mm').format(DateTime.parse(e['time']))}")),
+                    DataCell(Text(
+                        "${DateFormat('EEE, dd MMMM yy').format(DateTime.parse(e['time']))}")),
+                    DataCell(Text("")),
                   ]);
                 }).toList(),
+              ),
+            ),
+            SizedBox(
+              height: 100,
+            ),
+            Container(
+              child: IconButton(
+                iconSize: 100,
+                icon: const Icon(
+                  Icons.arrow_circle_right_outlined,
+                ),
+                onPressed: () async {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return ImagePickerScreen(datas: datas!);
+                      },
+                    ),
+                  );
+                },
               ),
             ),
           ],
